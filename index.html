@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Dinámica con Emojis</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #app {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        input[type="text"] {
+            width: calc(100% - 110px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #add-btn {
+            background-color: #28a745;
+            color: white;
+            margin-left: 10px;
+        }
+        #add-btn:hover {
+            background-color: #218838;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        ul li {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .edit-btn, .remove-btn {
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+            margin-right: 10px;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        
+        /* Media queries para dispositivos móviles */
+        @media (max-width: 600px) {
+            #app {
+                padding: 15px;
+                width: 95%;
+            }
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            #add-btn {
+                width: 100%;
+                margin: 10px 0 20px;
+            }
+            ul li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .edit-btn, .remove-btn {
+                width: 100%;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <h1>Lista Dinámica 😊</h1>
+        <input type="text" id="item-input" placeholder="Añadir nuevo elemento (emojis incluidos)">
+        <button id="add-btn">Añadir</button>
+
+        <div id="list-container">
+            <ul id="item-list">
+                <!-- Aquí se añaden los elementos de la lista dinámicamente -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Cargar la lista de localStorage
+        document.addEventListener('DOMContentLoaded', loadItems);
+
+        // Añadir el evento al botón de añadir
+        document.getElementById('add-btn').addEventListener('click', addItem);
+
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem('items')) || [];
+            items.forEach(item => createListItem(item));
+        }
+
+        function saveItems() {
+            const items = [];
+            document.querySelectorAll('#item-list li span').forEach(span => items.push(span.textContent));
+            localStorage.setItem('items', JSON.stringify(items));
+        }
+
+        function addItem() {
+            const input = document.getElementById('item-input');
+            const itemText = input.value.trim();
+
+            if (itemText === '') {
+                alert('No puedes añadir un elemento vacío');
+                return;
+            }
+
+            createListItem(itemText);
+            saveItems();  // Guardar los elementos en localStorage
+            input.value = '';  // Limpiar el campo de texto
+        }
+
+        function createListItem(text) {
+            const ul = document.getElementById('item-list');
+            const li = document.createElement('li');
+
+            li.innerHTML = `
+                <span>${text}</span>
+                <div>
+                    <button class="edit-btn" onclick="editItem(this)">Editar</button>
+                    <button class="remove-btn" onclick="removeItem(this)">Borrar</button>
+                </div>
+            `;
+            ul.appendChild(li);
+        }
+
+        function removeItem(button) {
+            const li = button.parentElement.parentElement;
+            li.remove();
+            saveItems();  // Guardar los cambios en localStorage
+        }
+
+        function editItem(button) {
+            const li = button.parentElement.parentElement;
+            const span = li.querySelector('span');
+
+            const newText = prompt("Modifica el elemento:", span.textContent);
+            if (newText !== null && newText.trim() !== '') {
+                span.textContent = newText;
+                saveItems();  // Guardar los cambios en localStorage
+            } else {
+                alert('El texto no puede estar vacío');
+            }
+        }
+    </script>
+
+</body>
+</html>
